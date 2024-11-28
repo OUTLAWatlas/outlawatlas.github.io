@@ -3,177 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My GitHub Portfolio</title>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <title>My GitHub Repositories</title>
     <style>
-        /* Global Styles */
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             background-color: #0d1117;
             color: #c9d1d9;
             line-height: 1.6;
+            margin: 0;
+            padding: 20px;
         }
 
-        /* Container */
-        .container {
+        .repos-container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
 
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4rem;
-        }
-
-        .header-title {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-            color: #58a6ff;
-        }
-
-        .header-subtitle {
-            color: #8b949e;
-            font-size: 1.2rem;
-        }
-
-        .nav-link {
-            text-decoration: none;
-            color: #58a6ff;
-            margin-left: 1rem;
-            transition: color 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        /* Main Sections */
-        .section {
+        .repo-card {
             background-color: #161b22;
             border-radius: 10px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .section-title {
-            color: #58a6ff;
-            margin-bottom: 1.5rem;
-        }
-
-        /* Projects Grid */
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .project-card {
-            background-color: #21262d;
-            border-radius: 8px;
-            padding: 1.5rem;
+            padding: 20px;
+            border: 1px solid #30363d;
             transition: transform 0.3s ease;
         }
 
-        .project-title {
+        .repo-card:hover {
+            transform: scale(1.05);
+        }
+
+        .repo-name {
             color: #58a6ff;
-            margin-bottom: 1rem;
+            font-size: 1.2em;
+            margin-bottom: 10px;
         }
 
-        .project-description {
+        .repo-description {
             color: #8b949e;
-            margin-bottom: 1rem;
+            margin-bottom: 15px;
         }
 
-        .project-link {
-            display: inline-block;
-            background-color: #238636;
-            color: white;
-            padding: 0.5rem 1rem;
+        .repo-details {
+            display: flex;
+            justify-content: space-between;
+            color: #8b949e;
+            font-size: 0.9em;
+        }
+
+        .repo-link {
+            color: #58a6ff;
             text-decoration: none;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
+            margin-top: 10px;
+            display: inline-block;
         }
 
-        /* Instructions List */
-        .instructions {
-            color: #8b949e;
-            padding-left: 2rem;
-        }
-
-        .instructions li {
-            margin-bottom: 1rem;
-        }
-
-        /* Footer */
-        .footer {
+        .loading {
             text-align: center;
-            margin-top: 2rem;
-            padding: 1rem;
             color: #8b949e;
         }
 
-        /* Responsive Adjustments */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .nav-link {
-                margin-top: 1rem;
-                margin-left: 0;
-            }
+        .error {
+            color: #f85149;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div>
-                <h1 class="header-title">Your Name</h1>
-                <p class="header-subtitle">Software Developer | Open Source Enthusiast</p>
-            </div>
-            <nav>
-                <a href="https://github.com/yourusername" target="_blank" class="nav-link">
-                    <i data-feather="github"></i> GitHub Profile
-                </a>
-            </nav>
-        </header>
-
-        <main>
-            <section class="section">
-                <h2 class="section-title">Featured Projects</h2>
-                
-                <div class="projects-grid">
-                    <div class="project-card">
-                        <h3 class="project-title">Project 1</h3>
-                        <p class="project-description">A brief description of your first project.</p>
-                        <a href="#" class="project-link">View Project</a>
-                    </div>
-
-                    <div class="project-card">
-                        <h3 class="project-title">Project 2</h3>
-                        <p class="project-description">A brief description of your second project.</p>
-                        <a href="#" class="project-link">View Project</a>
-                    </div>
-                </div>
-            </section>
-
-        </main>
-
-        <footer class="footer">
-            © 2024 Your Name. All rights reserved.
-        </footer>
+    <h1 style="text-align: center; color: #58a6ff;">My GitHub Repositories</h1>
+    <div id="repos-container" class="repos-container">
+        <p class="loading">Loading repositories...</p>
     </div>
 
     <script>
-        // Initialize Feather Icons
-        feather.replace();
+        // GitHub username - REPLACE WITH YOUR GITHUB USERNAME
+        const USERNAME = 'OUTLAWatlas';
+        
+        // GitHub API endpoint for user repositories
+        const API_URL = `https://api.github.com/users/OUTLAWatlas/repos`;
+
+        // Function to fetch repositories
+        async function fetchRepositories() {
+            const reposContainer = document.getElementById('repos-container');
+            
+            try {
+                // Fetch repositories
+                const response = await fetch(API_URL);
+                
+                // Check if the response is successful
+                if (!response.ok) {
+                    throw new Error('Failed to fetch repositories');
+                }
+                
+                // Parse the JSON response
+                const repos = await response.json();
+                
+                // Clear loading message
+                reposContainer.innerHTML = '';
+                
+                // Sort repositories by last updated date (most recent first)
+                repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+                
+                // Limit to first 6 repositories
+                repos.slice(0, 6).forEach(repo => {
+                    // Create repo card
+                    const repoCard = document.createElement('div');
+                    repoCard.classList.add('repo-card');
+                    
+                    // Format the card content
+                    repoCard.innerHTML = `
+                        <h2 class="repo-name">${repo.name}</h2>
+                        <p class="repo-description">${repo.description || 'No description'}</p>
+                        <div class="repo-details">
+                            <span>★ ${repo.stargazers_count}</span>
+                            <span>Forks: ${repo.forks_count}</span>
+                        </div>
+                        <a href="${repo.html_url}" target="_blank" class="repo-link">View Repository</a>
+                    `;
+                    
+                    // Add to container
+                    reposContainer.appendChild(repoCard);
+                });
+            } catch (error) {
+                // Handle any errors
+                reposContainer.innerHTML = `
+                    <p class="error">
+                        Error loading repositories: ${error.message}<br>
+                        Please check your GitHub username and internet connection.
+                    </p>
+                `;
+                console.error('Fetch error:', error);
+            }
+        }
+
+        // Fetch repositories when page loads
+        fetchRepositories();
     </script>
 </body>
 </html>
