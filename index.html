@@ -149,15 +149,9 @@
         <main>
             <section class="section">
                 <h2 class="section-title">Featured Projects</h2>
-                <div id="featured-projects-grid" class="projects-grid">
-                    <p class="loading">Loading featured repositories...</p>
-                </div>
-            </section>
-
-            <section class="section">
-                <h2 class="section-title">Other Projects</h2>
-                <div id="other-projects-grid" class="projects-grid">
-                    <p class="loading">Loading other repositories...</p>
+                
+                <div id="projects-grid" class="projects-grid">
+                    <p class="loading">Loading repositories...</p>
                 </div>
             </section>
         </main>
@@ -170,58 +164,68 @@
     <script>
         // GitHub username - REPLACE WITH YOUR GITHUB USERNAME
         const USERNAME = 'OUTLAWatlas';
+
+        // GitHub API endpoint for user repositories
         const API_URL = `https://api.github.com/users/${USERNAME}/repos`;
 
-        // List of featured projects (by name or partial match)
-        const FEATURED_PROJECTS = ['project-name-1', 'project-name-2']; // Replace with your featured repo names
-
+        // Function to fetch repositories
         async function fetchRepositories() {
-            const featuredGrid = document.getElementById('featured-projects-grid');
-            const otherGrid = document.getElementById('other-projects-grid');
-
+            const projectsGrid = document.getElementById('projects-grid');
+            
             try {
-                const response = await fetch(API_URL);
-                if (!response.ok) throw new Error('Failed to fetch repositories');
+                // Fetch repositories
+                const response = await fetch(API_URL);  
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch repositories');
+                }
+
                 const repos = await response.json();
 
-                // Clear loading messages
-                featuredGrid.innerHTML = '';
-                otherGrid.innerHTML = '';
+                projectsGrid.innerHTML = '';
 
-                // Separate featured and other repositories
-                repos.forEach(repo => {
-                    const repoCard = document.createElement('div');
-                    repoCard.classList.add('project-card');
-                    repoCard.innerHTML = `
-                        <h3 class="project-title">${repo.name.replace(/-/g, ' ')}</h3>
-                        <p class="project-description">${repo.description || 'No description available'}</p>
-                        <div class="project-meta">
-                            <span>★ ${repo.stargazers_count}</span>
-                            <span>Forks: ${repo.forks_count}</span>
-                        </div>
-                        <a href="${repo.html_url}" target="_blank" class="project-link">View Repository</a>
-                    `;
+                // Sort by recent updates and display the first 6
+                repos.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+                     .slice(0, 6)
+                     .forEach(repo => {
+                         // Skip forks if you want only original repositories
+                         if (repo.fork) return;
 
-                    // Add to featured or other projects grid
-                    if (FEATURED_PROJECTS.includes(repo.name)) {
-                        featuredGrid.appendChild(repoCard);
-                    } else {
-                        otherGrid.appendChild(repoCard);
-                    }
-                });
+                         // Check if the repository has a GitHub Pages deployment
+                         const hostedLink = `https://outlawatlas.github.io/pulsepro`;
 
-                // If no repositories found
-                if (featuredGrid.children.length === 0) featuredGrid.innerHTML = '<p class="error">No featured projects found.</p>';
-                if (otherGrid.children.length === 0) otherGrid.innerHTML = '<p class="error">No other projects found.</p>';
+                         const repoCard = document.createElement('div');
+                         repoCard.classList.add('project-card');
+                         repoCard.innerHTML = `
+                             <h3 class="project-title">${repo.name.replace(/-/g, ' ')}</h3>
+                             <p class="project-description">${repo.description || 'No description available'}</p>
+                             <div class="project-meta">
+                                 <span>★ ${repo.stargazers_count}</span>
+                                 <span>Forks: ${repo.forks_count}</span>
+                             </div>
+                             <a href="${hostedLink}" target="_blank" class="project-link">View Project</a>
+                         `;
+                         projectsGrid.appendChild(repoCard);
+                     });
 
+                if (projectsGrid.children.length === 0) {
+                    projectsGrid.innerHTML = '<p class="error">No public repositories found.</p>';
+                }
             } catch (error) {
-                featuredGrid.innerHTML = `<p class="error">Error: ${error.message}</p>`;
-                otherGrid.innerHTML = `<p class="error">Error: ${error.message}</p>`;
-                console.error(error);
+                projectsGrid.innerHTML = `
+                    <p class="error">
+                        Error loading repositories: ${error.message}<br>
+                        Please check your GitHub username and internet connection.
+                    </p>
+                `;
+                console.error('Fetch error:', error);
             }
         }
 
+        // Fetch repositories when page loads
         fetchRepositories();
+
+        // Initialize Feather Icons
         feather.replace();
     </script>
 </body>
